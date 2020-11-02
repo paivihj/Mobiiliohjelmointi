@@ -10,7 +10,7 @@ export default function App() {
 			
 			return(
 			<View style={styles.container}>
-			<div>Result: {result}</div>
+			<Text>Result: {result}</Text>
 			<TextInput style={styles.input}
 				keyboardType = 'numeric'
 				value={firstNumber}
@@ -36,12 +36,14 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
+	margin: 40,
 	flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
   input:{
+	width: 75,
     margin:3,
     padding: 10,
     borderWidth: 0.5,
