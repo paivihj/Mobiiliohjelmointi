@@ -16,7 +16,7 @@ if (guess==value){
 
 if (guess == 0){
   return (<View style={styles.container}>
-    Guess a number between 1-100
+    <Text>Guess a number between 1-100</Text>
     <TextInput style={styles.input}
       keyboardType = 'numeric'
       value={value}
@@ -31,7 +31,7 @@ if (guess == 0){
 
 if (guess > number){
   return(<View style={styles.container}>
-      Your guess {guess} is too high
+      <Text>Your guess {guess} is too high</Text>
       <TextInput style={styles.input}
       keyboardType = 'numeric'
       value={value}
@@ -47,7 +47,7 @@ if (guess > number){
 if (guess < number){
   return(  
     <View style={styles.container}>
-    Your guess {guess} is too low
+    <Text>Your guess {guess} is too low</Text>
     <TextInput style={styles.input}
       keyboardType = 'numeric'
       value={value}
