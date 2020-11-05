@@ -13,13 +13,13 @@ export default function App() {
 			<Text>Result: {result}</Text>
 			<TextInput style={styles.input}
 				keyboardType = 'numeric'
+				onChangeText={text => setFirstNumber(text)}
 				value={firstNumber}
-				onChangeText={firstNumber => setFirstNumber(firstNumber)}
 			/>
 			<TextInput style={styles.input}
 				keyboardType = 'numeric'
+				onChangeText={text => setSecondNumber(text)}
 				value={secondNumber}
-				onChangeText={secondNumber => setSecondNumber(secondNumber)}
 			/>
 			<View style={styles.button}>
 			<Button 
@@ -27,7 +27,7 @@ export default function App() {
 				title="+"
 			/>
 			<Button
-				onPress={ result => setResult(firstNumber-secondNumber) }
+				onPress={ result => setResult(parseInt(firstNumber)-parseInt(secondNumber)) }
 				title="-"
 			/></View>
 			</View>

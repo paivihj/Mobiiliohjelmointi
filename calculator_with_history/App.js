@@ -11,35 +11,40 @@ export default function App() {
   const [data, setData] = useState([]);
 
   const plusPressed = () => {
-    setResult(parseInt(firstNumber)+parseInt(secondNumber));
-    setText(String(firstNumber) + '+' + String(secondNumber) + '=' + String(parseInt(firstNumber)+parseInt(secondNumber)));
+    let result=0;
+    result=(parseInt(firstNumber)+parseInt(secondNumber));
+    setResult(result);
+    const text=`${firstNumber} + ${secondNumber} = ${result}`;
+    setText(text);
     setData([...data, { key: String(data.length), text: text}]);
-    setFirstNumber(0);
-    setSecondNumber(0);
+    setFirstNumber('');
+    setSecondNumber('');
   }
 
 
   const minusPressed = () => {
-    const[n1, n2]=[Number(firstNumber), Number(secondNumber)];
-    setResult(n1-n2);
-    setText(String(n1) + '-' + String(n2) + '=' + String(n1-n2));
-    setData([...data, {key: String(data.length), text:text}]);
-    setFirstNumber(0);
-    setSecondNumber(0);
+    let result=0;
+    result=(parseInt(firstNumber)-parseInt(secondNumber));
+    setResult(result);
+    const text=`${firstNumber} - ${secondNumber} = ${result}`;
+    setText(text);
+    setData([...data, { key: String(data.length), text: text}]);
+    setFirstNumber('');
+    setSecondNumber('');
   }
 			
 			return(
 			<View style={styles.container}>
 			<Text>Result: {result}</Text>
 			<TextInput style={styles.input}
-				keyboardType = 'number-pad'
+        keyboardType = 'number-pad'
+        onChangeText={text => setFirstNumber(text)}
 				value={firstNumber}
-				onChangeText={firstNumber => setFirstNumber(firstNumber)}
 			/>
 			<TextInput style={styles.input}
 				keyboardType = 'number-pad'
-				value={secondNumber}
-				onChangeText={secondNumber => setSecondNumber(secondNumber)}
+        onChangeText={text => setSecondNumber(text)}
+        value={secondNumber}
 			/>
 			<View style={styles.button}>
 			<Button

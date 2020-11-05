@@ -61,7 +61,8 @@ if (guess < number){
   )
 }
 else if (guess==number){
-  return(Alert.alert("You guessed the number " + number + " in " + times + " guesses"))
+  Alert.alert("You guessed the number " + number + " in " + times + " guesses");
+  return null;
 }}
 
 const styles = StyleSheet.create({
