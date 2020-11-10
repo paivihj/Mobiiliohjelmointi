@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View, TextInput, FlatList, Button } from 'react-native';
+import Hyperlink from 'react-native-hyperlink';
 
 export default function App() {
 
@@ -7,32 +8,40 @@ const[word, setWord]=useState('');
 const [recipes, setRecipes] = useState([]);
 
 const getRecipes = () => {
-  fetch(`http://www.recipepuppy.com/api/?=${word}`)
-  .then(response => response.json()) 
-  .then(data => {
-    setRecipes(data);})
-    .catch((error)=>{
-      Alert.alert('Error', error);
-  });
+  const url = `http://www.recipepuppy.com/api/?=${word}`;
+  fetch(url)
+  .then((response) => response.json()) 
+  .then((data) => {
+    setRecipes(data.results);})
 }
 
   return (
     <View style={styles.container}>
-      <FlatList
-      keyExtractor={item => item.results.href}
-      renderItem={({item}) => <Text>{item.results.title} <br></br> {item.results.thumbnail}</Text>}
-      data={recipes}
-    />
-      <TextInput style={styles.input}
-        placeholder="Ingredient"
-        onChangeText={text => setWord(text)}
-        value={word}
-			/>
+      <FlatList style={{marginTop:30}}
+        keyExtractor={(item, index) => String(index)}
+        renderItem={({item}) => {
+          return(
+            <View>
+              <Text>{item.title}</Text>
+              <Hyperlink linkDefault={ true }>
+                <Text style={{color:'blue', textDecorationLine:'underline'}}>{item.href}</Text>
+              </Hyperlink>
+            </View>
+            );
+          }}
+        data={recipes}
+      />
+      <View>
+        <TextInput style={styles.input}
+          value={word}
+          placeholder="Ingredient"
+          onChangeText={(text) => setWord(text)}
+			  />
 			<Button
 				onPress={getRecipes}
-				title=" FIND "
-			/>
+				title=" FIND "/>
       </View>
+    </View>
   );
 }
 
