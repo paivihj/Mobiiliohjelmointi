@@ -1,30 +1,36 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View, TextInput, FlatList, Button } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import {ListPicker} from '@react-native-picker/picker';
 
 export default function App() {
+
   const [value, setValue] = useState(0);
+  const [selectedCurrency, setSelectedCurrency]= useState(Object.keys(currencies[0]));
   const [currencies, setCurrencies] = useState([]);
-  const [keys, setKeys] = useState([]);
+  const [state, setState] = useState('');
   const [result, setResult] = useState(0);
 
-const getCurrencies = () => {
+React.useEffect(() => {
   fetch(`https://api.exchangeratesapi.io/latest`)
   .then(response => response.json())
   .then(data => {
-    setCurrencies(data);
+    setCurrencies(data.rates);
   })
   .catch((error)=>{
     Alert.alert('Error', error);
   })
-};
+}, []);
 
-state = {country: ''}
- (Object.keys(currencies));
+const i=0;
+  for (i; i<currencies.length; i++) {
+  this.state = {
+    currency: Object.keys(currencies[i])
+  };
+  };
 
 const convert = () => {
-    const result = value/currencies(itemValue);
+    const result = parseInt(value)/currencies(state);
     setResult(result);
 };
 
@@ -35,10 +41,12 @@ const convert = () => {
         onChangeText={text => setValue(text)}
         value={value}
 			/>
-      <Picker
-        selectedValue={keys}
-        style={{height: 50, width: 100}}>
-      </Picker>
+      <ListPicker
+        ref={(picker)=>{ this.picker = picker; }}
+        onChange={(value)=>this.setState({currency})}
+        style={{height: 50, width: 100}}
+        dataList={currencies}
+      />
 			<Button
 				onPress={convert}
 				title="CONVERT"
