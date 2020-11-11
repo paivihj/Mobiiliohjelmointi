@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, View, TextInput, FlatList, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, FlatList, Button, Image } from 'react-native';
 import Hyperlink from 'react-native-hyperlink';
 
 export default function App() {
@@ -23,9 +23,9 @@ const getRecipes = () => {
           return(
             <View>
               <Text>{item.title}</Text>
-              <Hyperlink linkDefault={ true }>
-                <Text style={{color:'blue', textDecorationLine:'underline'}}>{item.href}</Text>
-              </Hyperlink>
+              <Image
+                style={{width:50, height:50}}
+                source={{uri: `${item.thumbnail}`}}/>
             </View>
             );
           }}
