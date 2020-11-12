@@ -1,9 +1,17 @@
-import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button, Keyboard, Dimensions } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, Text, TextInput, Button, Alert } from 'react-native';
 import MapView, { Marker} from 'react-native-maps';
+import * as Location from 'expo-location';
 
 export default function App() {
 
+  const [isReady, setReady] = React.useState(false);
+  const [location, setLocation] = React.useState({latitude: null, longitude: null});
+  const [initRegion, SetInitRegion] = React.useState({
+                              latitude: 60.200692,
+                              longitude: 24.934302,
+                              latitudeDelta: 0.0322,
+                              longitudeDelta: 0.0221});
   const [address, setAddress] = React.useState('');
   const [coordinates, setCoordinates] = React.useState({latitude: 60.201373, longitude: 24.934041});
   const [region, setRegion] = React.useState({
@@ -12,6 +20,24 @@ export default function App() {
                               latitudeDelta: 0.0322,
                               longitudeDelta: 0.0221});
 
+  useEffect(()=>{
+    getLocation();
+    SetInitRegion({...region, latitude: (location.latitude-0.002), longitude: (location.longitude+0.0006)});
+    console.log(location);
+    setReady(true);
+  }, []);
+
+  const getLocation = async () => {
+    let { status } = await Location.requestPermissionsAsync();
+    if (status !== 'granted'){
+      Alert.alert('No permission to location');
+    }
+    else {
+      let currentlocation = await Location.getCurrentPositionAsync({});
+      setLocation({latitude: currentlocation.coords.latitude, longitude: currentlocation.coords.longitude});
+    }
+  };
+    
   const getCoordinates = () => {
     const url = `http://www.mapquestapi.com/geocoding/v1/address?key=7sCnijZS59uTJITuAwzMXFadM8VTRAHF&location=${address}`;
     fetch(url)
@@ -25,16 +51,22 @@ export default function App() {
     });
   }
 
+  if (isReady==false) {
+    return (
+      <View style={styles.container}><Text>Loading...</Text></View>
+    )
+  }
+  else {
   return (
     <View style={styles.container}>
       <MapView 
         style={styles.map}
-        initialRegion={region}
+        initialRegion={initRegion}
         region={region}
       >
         <Marker 
-          coordinate={coordinates}
-          title='Haaga-Helia'
+          coordinate={location}
+          title='Current location'
         />
       </MapView>
       <View style={styles.input}>
@@ -50,6 +82,7 @@ export default function App() {
       </View>
     </View>
   );
+}
 }
 
 const styles = StyleSheet.create({
@@ -76,3 +109,4 @@ const styles = StyleSheet.create({
     height: '100%'
    }
 });
+
