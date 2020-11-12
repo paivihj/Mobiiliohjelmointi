@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, FlatList, Button } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 export default function App() {
@@ -7,7 +7,7 @@ export default function App() {
   const [value, setValue] = useState('');
   const [selectedCurrency, setSelectedCurrency]= useState('');
   const [currencies, setCurrencies] = useState([]);
-  const [result, setResult] = useState(0);
+  const [result, setResult] = useState('');
   const [currencyList, setCurrencyList] = useState([]);
   const [factor, setFactor] = useState(1);
 
@@ -22,17 +22,7 @@ React.useEffect(() => {
 }, []);
 
 const convert = () => {
-    switch(selectedCurrency){
-      case "CAD":
-        setFactor(currencies.CAD);
-      break;
-      case "HKD":
-        setFactor(currencies.HKD);
-      break;
-      case "GBP":
-        setFactor(currencies.GBP);
-    }
-    const convertedresult = parseFloat(value)/factor;
+    const convertedresult = parseFloat(value)/currencies[selectedCurrency];
     setResult(convertedresult.toFixed(2));
 };
 
