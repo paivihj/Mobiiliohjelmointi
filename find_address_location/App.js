@@ -6,14 +6,13 @@ import * as Location from 'expo-location';
 export default function App() {
 
   const [isReady, setReady] = React.useState(false);
-  const [location, setLocation] = React.useState({latitude: null, longitude: null});
   const [initRegion, SetInitRegion] = React.useState({
                               latitude: 60.200692,
                               longitude: 24.934302,
                               latitudeDelta: 0.0322,
                               longitudeDelta: 0.0221});
   const [address, setAddress] = React.useState('');
-  const [coordinates, setCoordinates] = React.useState({latitude: 60.201373, longitude: 24.934041});
+  const [coordinates, setCoordinates] = React.useState({latitude: 0, longitude: 0});
   const [region, setRegion] = React.useState({
                               latitude: 60.200692,
                               longitude: 24.934302,
@@ -22,8 +21,8 @@ export default function App() {
 
   useEffect(()=>{
     getLocation();
-    SetInitRegion({...region, latitude: (location.latitude-0.002), longitude: (location.longitude+0.0006)});
-    console.log(location);
+    SetInitRegion({...initRegion, latitude: (coordinates.latitude-0.002), longitude: (coordinates.longitude+0.0006)});
+    console.log(coordinates);
     setReady(true);
   }, []);
 
@@ -34,7 +33,7 @@ export default function App() {
     }
     else {
       let currentlocation = await Location.getCurrentPositionAsync({});
-      setLocation({latitude: currentlocation.coords.latitude, longitude: currentlocation.coords.longitude});
+      setCoordinates({latitude: currentlocation.coords.latitude, longitude: currentlocation.coords.longitude});
     }
   };
     
@@ -65,8 +64,7 @@ export default function App() {
         region={region}
       >
         <Marker 
-          coordinate={location}
-          title='Current location'
+          coordinate={coordinates}
         />
       </MapView>
       <View style={styles.input}>
