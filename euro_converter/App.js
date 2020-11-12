@@ -1,57 +1,64 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, View, TextInput, FlatList, Button } from 'react-native';
-import {ListPicker} from '@react-native-picker/picker';
+import { StyleSheet, Text, View, TextInput, FlatList, Button } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
 export default function App() {
 
-  const [value, setValue] = useState(0);
-  const [selectedCurrency, setSelectedCurrency]= useState(Object.keys(currencies[0]));
+  const [value, setValue] = useState('');
+  const [selectedCurrency, setSelectedCurrency]= useState('');
   const [currencies, setCurrencies] = useState([]);
-  const [state, setState] = useState('');
   const [result, setResult] = useState(0);
+  const [currencyList, setCurrencyList] = useState([]);
+  const [factor, setFactor] = useState(1);
 
 React.useEffect(() => {
   fetch(`https://api.exchangeratesapi.io/latest`)
   .then(response => response.json())
   .then(data => {
+    console.log(data.rates);
     setCurrencies(data.rates);
-  })
-  .catch((error)=>{
-    Alert.alert('Error', error);
-  })
+    setCurrencyList(Object.keys(data.rates));
+  })  
 }, []);
 
-const i=0;
-  for (i; i<currencies.length; i++) {
-  this.state = {
-    currency: Object.keys(currencies[i])
-  };
-  };
-
 const convert = () => {
-    const result = parseInt(value)/currencies(state);
-    setResult(result);
+    switch(selectedCurrency){
+      case "CAD":
+        setFactor(currencies.CAD);
+      break;
+      case "HKD":
+        setFactor(currencies.HKD);
+      break;
+      case "GBP":
+        setFactor(currencies.GBP);
+    }
+    const convertedresult = parseFloat(value)/factor;
+    setResult(convertedresult.toFixed(2));
 };
 
   return (
     <View style={styles.container}>
-      <Text>{result}</Text>
+      <Text style={{fontSize:20, marginBottom:20}}>{result} €</Text>
+      <View style={{flexDirection: 'row'}}>
       <TextInput style={styles.input}
         onChangeText={text => setValue(text)}
         value={value}
 			/>
-      <ListPicker
-        ref={(picker)=>{ this.picker = picker; }}
-        onChange={(value)=>this.setState({currency})}
+      <Picker
+        selectedValue={selectedCurrency}
         style={{height: 50, width: 100}}
-        dataList={currencies}
-      />
+        onValueChange={(itemValue, itemIndex)=>setSelectedCurrency(itemValue)}>
+        {currencyList.map(currency =>
+          (
+            <Picker.Item label={currency} value={currency} key={currency}/>
+          ))}
+      </Picker>
+      </View>
 			<Button
 				onPress={convert}
 				title="CONVERT"
 			/>
-      </View>
+    </View>
   );
 }
 
@@ -63,10 +70,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   input:{
-    width: 100,
+    fontSize:17,
+    width: 80,
     margin: 2,
-    padding: 10,
-    borderWidth: 0.5,
+    paddingLeft: 10,
+    borderBottomWidth: 1,
     borderRadius: 4,
     backgroundColor: "#fff"
    },
