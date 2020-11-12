@@ -38,7 +38,7 @@ export default function App() {
   };
     
   const getCoordinates = () => {
-    const url = `http://www.mapquestapi.com/geocoding/v1/address?key=7sCnijZS59uTJITuAwzMXFadM8VTRAHF&location=${address}`;
+    const url = `http://www.mapquestapi.com/geocoding/v1/address?key=&location=${address}`;
     fetch(url)
     .then((response) => response.json()) 
     .then((data) => {
