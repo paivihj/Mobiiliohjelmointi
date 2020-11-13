@@ -6,22 +6,16 @@ import * as Location from 'expo-location';
 export default function App() {
 
   const [isReady, setReady] = React.useState(false);
-  const [initRegion, SetInitRegion] = React.useState({
-                              latitude: 60.200692,
-                              longitude: 24.934302,
-                              latitudeDelta: 0.0322,
-                              longitudeDelta: 0.0221});
   const [address, setAddress] = React.useState('');
   const [coordinates, setCoordinates] = React.useState({latitude: 0, longitude: 0});
   const [region, setRegion] = React.useState({
-                              latitude: 60.200692,
-                              longitude: 24.934302,
+                              latitude: 0,
+                              longitude: 0,
                               latitudeDelta: 0.0322,
                               longitudeDelta: 0.0221});
 
   useEffect(()=>{
     getLocation();
-    SetInitRegion({...initRegion, latitude: (coordinates.latitude-0.002), longitude: (coordinates.longitude+0.0006)});
     console.log(coordinates);
     setReady(true);
   }, []);
@@ -34,6 +28,7 @@ export default function App() {
     else {
       let currentlocation = await Location.getCurrentPositionAsync({});
       setCoordinates({latitude: currentlocation.coords.latitude, longitude: currentlocation.coords.longitude});
+      setRegion({...region, latitude: (currentlocation.coords.latitude-0.002), longitude: (currentlocation.coords.longitude+0.0006)});
     }
   };
     
@@ -60,7 +55,6 @@ export default function App() {
     <View style={styles.container}>
       <MapView 
         style={styles.map}
-        initialRegion={initRegion}
         region={region}
       >
         <Marker 
