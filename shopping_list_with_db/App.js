@@ -16,7 +16,7 @@ export default function App() {
     updateList();    
   }, []);
 
-  // Save course
+  // Save item
   const saveItem = () => {
     db.transaction(tx => {
         tx.executeSql('insert into shopping_list (amount, product) values (?, ?);', [amount, title]);    
@@ -26,7 +26,7 @@ export default function App() {
     setTitle('');
   }
 
-  // Update courselist
+  // Update shoppinglist
   const updateList = () => {
     db.transaction(tx => {
       tx.executeSql('select * from shopping_list;', [], (_, { rows }) =>
@@ -35,7 +35,7 @@ export default function App() {
     });
   }
 
-  // Delete course
+  // Delete item
   const deleteItem = (id) => {
     db.transaction(
       tx => {
