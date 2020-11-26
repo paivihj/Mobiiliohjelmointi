@@ -5,7 +5,7 @@ import * as Contacts from 'expo-contacts';
 
 export default function App() {
 
-  const [contact, setContact] = useState({id: '', name:'', number:''});
+  //const [contact, setContact] = useState({id: '', name:'', number:''});
   const [contactList, setContactList] = useState([]);
   
   const getContacts = async() => {
@@ -22,14 +22,10 @@ export default function App() {
       for (var i = 0; i<data.length; i++){
         try {
           setContactList([...contactList, {id: data[i].lookupKey, name: data[i].name, number: data[i].phoneNumbers[0].number}]);
-          //const newList = contactList.concat({contact});
         } catch(err) {
           setContactList([...contactList, {id: data[i].lookupKey, name: data[i].name, number: ''}]);
         };
     }
-    //setContactList([...contactList, {name: data[50].name, number: data[50].phoneNumbers[0].number}]);
-    //setContactList([...contactList, {name: data[10].name, number: data[10].phoneNumbers[0].number}]);
-    //console.log(contact);
   }
   }
   console.log(contactList);
