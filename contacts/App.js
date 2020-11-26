@@ -5,11 +5,11 @@ import * as Contacts from 'expo-contacts';
 
 export default function App() {
 
-  //const [contact, setContact] = useState({id: '', name:'', number:''});
-  const [contactList, setContactList] = useState([]);
+  const [contact, setContact] = useState({id: '', name:'', number:''});
+  //const [contactList, setContactList] = useState([]);
   
   const getContacts = async() => {
-    setContactList([]);
+    //setContactList([]);
 
     const { status } = await Contacts.requestPermissionsAsync();
   
@@ -19,30 +19,22 @@ export default function App() {
       });
       
     if (data.length>0) {
-      for (var i = 0; i<data.length; i++){
+      var i = 150;
+      //for (var i = 0; i<data.length; i++){
         try {
-          setContactList([...contactList, {id: data[i].lookupKey, name: data[i].name, number: data[i].phoneNumbers[0].number}]);
+          setContact({id: data[i].lookupKey, name: data[i].name, number: data[i].phoneNumbers[0].number});
         } catch(err) {
-          setContactList([...contactList, {id: data[i].lookupKey, name: data[i].name, number: ''}]);
+          setContact({id: data[i].lookupKey, name: data[i].name, number: ''});
         };
-    }
+    //}
   }
   }
-  console.log(contactList);
+  console.log(contact);
 }
   
   return (
     <View style={styles.container}>
-    <View style={styles.list}>
-    <FlatList
-        data={contactList}
-        keyExtractor={item => item.id}
-        renderItem={({item}) => { 
-            <View>
-              <Text>{item.name} {item.number}</Text>
-            </View>}}
-    />
-    </View> 
+    <Text>{contact.name} {contact.number}</Text>
     <Button
       onPress={getContacts}
       title="Get Contacts"
