@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TextInput } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TextInput, ScrollView } from 'react-native';
 import { Header, Icon, Input, Button, ListItem } from 'react-native-elements';
 import * as SQLite from 'expo-sqlite';
 
@@ -48,29 +48,29 @@ export default function App() {
 
   return(
     <View style={styles.container}>
-    <Header centerComponent={{ text: 'SHOPPING LIST', style: { color:'white'}}}
-    backgroundColor='pink'/>
+    <Header centerComponent={{ text: 'SHOPPING LIST', style: { fontWeight: 'bold', color:'white'}}}
+    backgroundColor='hotpink'/>
     <Input placeholder='Product' label='PRODUCT' 
         onChangeText={(title) => setTitle(title)}
         value={title}/>  
       <Input placeholder='Amount' label='AMOUNT' 
         onChangeText={(amount) => setAmount(amount)}
         value={amount}/>      
-        <Button raised icon={{name: 'save', color:'white', }} onPress={saveItem} title=" Save" /> 
-      <View style={styles.child}> 
-      <FlatList style={{width: 150}}
+      <Button raised icon={{name: 'save', color:'white', }} buttonStyle={{backgroundColor: 'hotpink'}} onPress={saveItem} title=" SAVE " /> 
+      <FlatList style={styles.list}
         keyExtractor={item => item.id.toString()} 
         data={list} 
         renderItem={({ item }) => (
         <ListItem bottomDivider>
           <ListItem.Content>
-            <ListItem.Title><Text>{item.product}</Text></ListItem.Title>
-            <ListItem.Subtitle><Text>{item.amount}</Text></ListItem.Subtitle>
-            <Icon type='material' name='delete' color='red' onPress={() => deleteItem(item.id)}/> 
+            <ListItem.Title>{item.product}</ListItem.Title>
+            <ListItem.Subtitle>{item.amount}</ListItem.Subtitle>
           </ListItem.Content>
-        </ListItem>)}
+          <Icon type='material' name='delete' color='red' onPress={() => deleteItem(item.id)}/> 
+        </ListItem>
+        )}
       />      
-      </View>
+     
     </View>
     );
 }
@@ -84,23 +84,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
   },
-  child: {
-    margin: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   list: {
-    flexDirection: 'row',
-    alignItems: 'center',
     fontSize: 18,
     padding: 3,
+    width: '100%',
   },
-  input:{
-    width: 200,
-    margin:5,
-    padding: 5,
-    borderWidth: 0.5,
-    borderRadius: 4,
-    backgroundColor: "#fff"
-   },
 });
