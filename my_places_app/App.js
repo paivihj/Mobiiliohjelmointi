@@ -66,6 +66,14 @@ function Home({ navigation }){
     navigation.navigate('Map', {coordinates})
   }
 
+  const deleteAddress = (id) => {
+    db.transaction(
+      tx => {
+        tx.executeSql(`delete from places where id = ?;`, [id]);
+      }, null, updateList
+    )    
+  }
+
   return(
     <View style={styles.container}>
     <Input placeholder='Type address' label='PLACEFINDER' 
@@ -84,7 +92,9 @@ function Home({ navigation }){
           <ListItem.Content>
             <ListItem.Title>{item.address}</ListItem.Title>
           </ListItem.Content>
-          <Icon type='material' name='delete' color='red' onPress={()=>getCoordinates(item.address)}/> 
+          <Text style={{color:'lightgrey'}}>Show on map</Text><Icon type='material' name='keyboard-arrow-right' color='lightgrey' 
+          onPress={()=>getCoordinates(item.address)}
+          onLongPress={()=>deleteAddress(item.id)}/>
         </ListItem>
         )}
       />    
