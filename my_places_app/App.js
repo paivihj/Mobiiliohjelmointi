@@ -4,7 +4,7 @@ import MapView, { Marker} from 'react-native-maps';
 import * as Location from 'expo-location';
 import { NavigationContainer} from'@react-navigation/native';
 import { createStackNavigator} from'@react-navigation/stack';
-import { Header, Icon, Input, Button, ListItem } from 'react-native-elements';
+import { Icon, Input, Button, ListItem } from 'react-native-elements';
 import * as SQLite from 'expo-sqlite';
 
 const Stack = createStackNavigator();
@@ -26,9 +26,6 @@ function Home({ navigation }){
 
   const [text, setText] = useState('');
   const [data, setData] = useState([]);
-  const [isReady, setReady] = React.useState(false);
-  const [address, setAddress] = React.useState('');
-  const [coordinates, setCoordinates] = React.useState({latitude: 0, longitude: 0});
 
   useEffect(() => {
     db.transaction(tx => {
@@ -54,16 +51,8 @@ function Home({ navigation }){
   }
 
   const getCoordinates = (address) => {
-    const url = `http://www.mapquestapi.com/geocoding/v1/address?key=7sCnijZS59uTJITuAwzMXFadM8VTRAHF&location=${address}`;
-    fetch(url)
-    .then((response) => response.json()) 
-    .then((data) => {
-      setCoordinates({latitude: data.results[0].locations[0].latLng.lat, longitude: data.results[0].locations[0].latLng.lng});
-    })
-    .catch((error)=>{
-        Alert.alert('Error', error);
-    });
-    navigation.navigate('Map', {coordinates})
+    const url = `http://www.mapquestapi.com/geocoding/v1/address?key=&location=${address}`;
+    navigation.navigate('Map', {url})
   }
 
   const deleteAddress = (id) => {
@@ -80,15 +69,15 @@ function Home({ navigation }){
       onChangeText={text => setText(text)}
       value={text}
     />
-    <Button raised icon={{name: 'save', color:'white', }} buttonStyle={{backgroundColor: 'grey', width:'100%'}}
+    <Button raised icon={{name: 'save', size:20, color:'white' }} buttonStyle={{backgroundColor: 'grey', width:'100%'}}
       onPress={() => buttonPressed()}
-      title=" SAVE                          "
+      title="  SAVE                       "
     />
     <FlatList style={styles.list}
         keyExtractor={item => item.id.toString()} 
         data={data} 
         renderItem={({ item }) => (
-        <ListItem bottomDivider>
+        <ListItem bottomDivider topDivider>
           <ListItem.Content>
             <ListItem.Title>{item.address}</ListItem.Title>
           </ListItem.Content>
@@ -103,12 +92,24 @@ function Home({ navigation }){
 }
 
 function Map({ route, navigation }){
-  const { coordinates } = route.params;
+  const { url } = route.params;
+  const [coordinates, setCoordinates] = React.useState({latitude: 0, longitude: 0});
   const [region, setRegion] = React.useState({
     latitude: coordinates.latitude,
     longitude: coordinates.longitude,
     latitudeDelta: 0.0322,
     longitudeDelta: 0.0221});
+  
+    fetch(url)
+    .then((response) => response.json()) 
+    .then((mapdata) => {
+      setCoordinates({latitude: mapdata.results[0].locations[0].latLng.lat, longitude: mapdata.results[0].locations[0].latLng.lng});
+      setRegion({...region, latitude: (mapdata.results[0].locations[0].latLng.lat-0.002), longitude: (mapdata.results[0].locations[0].latLng.lng+0.0006)})
+    })
+    .catch((error)=>{
+        Alert.alert('Error', error);
+    });
+  
 
   return (
     <View style={styles.container}>
@@ -120,10 +121,6 @@ function Map({ route, navigation }){
           coordinate={coordinates}
         />
       </MapView>
-      <View style={styles.input}>
-        <Button
-          title=" SHOW "/>
-      </View>
     </View>
   );
 }
@@ -153,7 +150,7 @@ const styles = StyleSheet.create({
    },
    list: {
     fontSize: 18,
-    padding: 3,
+    padding: 1,
     width: '100%',
   },
 });
