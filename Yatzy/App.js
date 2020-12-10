@@ -11,7 +11,7 @@ import { Camera } from'expo-camera';
 
 const Tab = createBottomTabNavigator();
 
-export default function App() {
+export default function App() { 
     const [visible, setVisible] = useState(true);
 
     const [hasCameraPermission, setPermission] = useState(null);
