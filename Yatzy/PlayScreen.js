@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from'react';
 import { View, StyleSheet, Image, Alert, BackHandler } from'react-native';
-import { Button, Overlay, Text, Input, Icon, registerCustomIconType } from 'react-native-elements';
+import { Button, Overlay, Text, Input, Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
-import RNExitApp from 'react-native-exit-app';
+import DialogInput from 'react-native-dialog-input';
+import Firebase from './firebase';
 
 export default function PlayScreen(props) {
     const [ones, setOnes] = useState('');
@@ -20,25 +21,27 @@ export default function PlayScreen(props) {
     const [fullH, setFullH] = useState('');
     const [chance, setChance] = useState('');
     const [yatzy, setYatzy] = useState('');
-    //const [results, setResults]=useState(['','','','','','','','','','','','','','','','']);
     const [total, setTotal]=useState(0);
     const [bonus, setBonus]=useState(0);
     const [rounds, setRounds]=useState(0);
+    const [name, setName] = useState('');
+    const [help, setHelp] =useState(false);
+    const [alert, setAlert]=useState(true);
 
     useEffect(() => {
-        if (rounds==15) {
+        if (rounds==15 && name.length==0 && alert==true) {
             Alert.alert(
                 "You are the champion with " + total + " points!",
                 "If you want to save your result, press SAVE",
                 [
                     {
-                        text: "Cancel and exit app",
+                        text: "Exit app",
                         onPress:() => BackHandler.exitApp(),
                         style:"negative"
                     },
                     {
                         text: "SAVE",
-                        onPress: () => saveResult(),
+                        onPress: () => {setAlert(false); saveResult()},
                         style:"positive"
                     }
                 ]
@@ -47,7 +50,14 @@ export default function PlayScreen(props) {
     });
 
     const saveResult = () => {
-        console.log("save to firebase");
+        setHelp(true);
+    };
+
+    const saveToFirebase = (text) => {
+        Firebase.database().ref('scores/').push(
+            {'name': text, 'points':total}
+        );
+        props.navigation.navigate("High Scores");
     }
     
     const registerYatzy = () => {
@@ -257,9 +267,13 @@ export default function PlayScreen(props) {
 
     return(
     <View style={styles.container}>
+        <DialogInput isDialogVisible={help}
+                title={"Insert the name of the player"}
+                hintInput ={"Name"}
+                submitInput={ (inputText) => {setName(inputText); saveToFirebase(inputText); setHelp(false)}}
+                closeDialog={ () => BackHandler.exitApp()}>
+        </DialogInput>
       <View style={{flex:1, justifyContent: 'flex-end'}}>
-        <Image style={{height:60, width: 50}}
-            source={{ uri: props.photoName }} />
         <Text h4>
             Total points 
         </Text>

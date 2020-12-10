@@ -75,10 +75,13 @@ export default function App() {
   else if (!visible){
     return (
     <NavigationContainer>
+      <Image style={{height:20, width: 10}}
+            source={{ uri: photoName }} />
      <Tab.Navigator>
        <Tab.Screen name="Play" component={PlayScreen}/>
-       <Tab.Screen name="Scores" component={HighScores}/>
+       <Tab.Screen name="High Scores" component={HighScores}/>
      </Tab.Navigator>
+  
    </NavigationContainer>
     );}
 }
