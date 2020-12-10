@@ -20,13 +20,13 @@ useEffect(() => {
     return(
     <View style={styles.container}>
         <FlatList
-          ListHeaderComponent={()=><Text style={{fontWeight:'bold'}}>High Scores</Text>}
+          ListHeaderComponent={()=><Text style={{marginBottom:10, fontWeight:'bold', fontSize:20}}>High Scores</Text>}
           data={results.sort(function(a, b){
             return (parseInt(b.points)-parseInt(a.points))
           })
           }
-          renderItem={({item}) =>
-            <Text> {item.name} {item.points}</Text>}
+          renderItem={({item, index}) =>
+            <Text style={{fontSize:16}}>{index+1}. {item.name} {item.points}</Text>}
           />
     </View >
     );

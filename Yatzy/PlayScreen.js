@@ -1,11 +1,21 @@
-import React, { useState, useEffect } from'react';
+import React, { useState, useEffect, useRef } from'react';
 import { View, StyleSheet, Image, Alert, BackHandler } from'react-native';
-import { Button, Overlay, Text, Input, Icon } from 'react-native-elements';
+import { Button, Overlay, Text, Input, Icon} from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 import DialogInput from 'react-native-dialog-input';
 import Firebase from './firebase';
+import * as Permissions from 'expo-permissions';
+import { Camera } from'expo-camera';
+import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
 
 export default function PlayScreen(props) {
+    const [visible, setVisible] = useState(true);
+    const [hasCameraPermission, setPermission] = useState(null);
+    const[photoName, setPhotoName] = useState('');
+    const [type, setType] = useState(Camera.Constants.Type.front);
+    const camera= useRef(null);
+
     const [ones, setOnes] = useState('');
     const [twos, setTwos] = useState('');
     const [threes, setThrees] = useState('');
@@ -28,6 +38,36 @@ export default function PlayScreen(props) {
     const [help, setHelp] =useState(false);
     const [alert, setAlert]=useState(true);
 
+    const iconSize=useState(15);
+
+    useEffect(() =>{
+        askCamera();
+      }, []);
+
+      const askCamera = async () => {
+        const { status } = await Camera.requestPermissionsAsync();
+        setPermission(status=='granted');
+      }
+  
+      const snap = async () => {
+        console.log('Taking photo');
+        if (camera) {
+          const photo = await camera.current.takePictureAsync({base: true});
+          console.log(photo);
+          setPhotoName(photo.uri);
+          //this.props.navigation.navigate("Play", { data: photoName })
+          setVisible(false);
+        }
+      };
+  
+      const setCamera = () => {
+        if (type == Camera.Constants.Type.front){
+          setType(Camera.Constants.Type.back);
+        } else {
+          setType(Camera.Constants.Type.front);
+        }
+      }
+    
     useEffect(() => {
         if (rounds==15 && name.length==0 && alert==true) {
             Alert.alert(
@@ -265,6 +305,34 @@ export default function PlayScreen(props) {
         }
     }
 
+    if (visible) {
+        return (
+          <View style={styles.container}>
+          <Overlay isVisible={visible}>
+            <View>
+                <Text style={{ fontSize:20, fontWeight:'bold' }}>
+                    Welcome to Yatzy!</Text>
+                <Text>Take a photo of the player to enter the result table.</Text>
+            { hasCameraPermission ?
+                (
+                <View style={{ flex:1 }}>
+                <Camera type={type} onPress={setCamera} 
+                      style={{ flex:3, margin:20, width:250 }} ref={camera}
+                />
+            <View style={{ flex: 2 }}>
+             <Button title="Change Camera" onPress={setCamera}/>
+             <Button title="Take Photo" onPress={snap} />
+            </View>
+            </View>
+            ) : (
+            <Text>No access to camera</Text>
+            )}
+            </View>
+          </Overlay>
+         </View>
+        );}
+      
+    else if (!visible){
     return(
     <View style={styles.container}>
         <DialogInput isDialogVisible={help}
@@ -274,6 +342,12 @@ export default function PlayScreen(props) {
                 closeDialog={ () => BackHandler.exitApp()}>
         </DialogInput>
       <View style={{flex:1, justifyContent: 'flex-end'}}>
+        <Text style={{fontSize: 14, fontStyle:'italic'}}>
+            Insert your points on the rows right. To register the result, press the icon on the left.
+            Good luck!
+        </Text>
+        <Image style={{height:150, width: 120}}
+            source={{ uri: photoName }} />
         <Text h4>
             Total points 
         </Text>
@@ -285,7 +359,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Ones'
-            leftIcon={{ size: 15, type: 'material-community', name: 'dice-1',
+            leftIcon={{ size: 18, type: 'material-community', name: 'dice-1',
                 onPress:()=>registerOnes()}}
             onChangeText={text=> setOnes(text)}
             value={ones}
@@ -295,7 +369,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Twos'
-            leftIcon={{ size: 15, type: 'material-community', name: 'dice-2',
+            leftIcon={{ size: 18, type: 'material-community', name: 'dice-2',
                 onPress:()=>registerTwos()}}
             onChangeText={text=> setTwos(text)}
             value={twos}
@@ -305,7 +379,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Threes'
-            leftIcon={{ size: 15, type: 'material-community', name: 'dice-3',
+            leftIcon={{ size: 18, type: 'material-community', name: 'dice-3',
                 onPress:()=>registerThrees()}}
             onChangeText={text=> setThrees(text)}
             value={threes}
@@ -315,7 +389,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Fours'
-            leftIcon={{ size: 15, type: 'material-community', name: 'dice-4',
+            leftIcon={{ size: 18, type: 'material-community', name: 'dice-4',
                 onPress:()=>registerFours()}}
             onChangeText={text=> setFours(text)}
             value={fours}
@@ -323,7 +397,7 @@ export default function PlayScreen(props) {
         <Input
             placeholder='Fives'
             keyboardType='numeric'
-            leftIcon={{ size: 15, type: 'material-community', name: 'dice-5',
+            leftIcon={{ size: 18, type: 'material-community', name: 'dice-5',
                 onPress:()=>registerFives()}}
             inputContainerStyle={styles.input}
             inputStyle={styles.text}
@@ -333,7 +407,7 @@ export default function PlayScreen(props) {
         <Input
             placeholder='Sixes'
             keyboardType='numeric'
-            leftIcon={{ size: 15, type: 'material-community', name: 'dice-6',
+            leftIcon={{ size: 18, type: 'material-community', name: 'dice-6',
                 onPress:()=>registerSixes()}}
             inputContainerStyle={styles.input}
             inputStyle={styles.text}
@@ -349,7 +423,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Pair'
-            leftIcon={{ size:15, type:'material-community', name:'dice-6',
+            leftIcon={{ size:18, type:'material-community', name:'dice-d12',
                 onPress:()=>registerPair()}}
             onChangeText={text=> setPair(parseInt(text))}
             value={pair}
@@ -359,7 +433,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Two pairs'
-            leftIcon={{ size:15, type:'material-community', name:'dice-6',
+            leftIcon={{ size:18, type:'material-community', name:'dice-multiple',
                 onPress:()=>registerTP()}}
             onChangeText={text=> setTwoPairs(text)}
             value={twoPairs}
@@ -369,7 +443,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Three same'
-            leftIcon={{ size:15, type:'material-community', name:'dice-6',
+            leftIcon={{ size:18, type:'material-community', name:'dice-3',
                 onPress:()=>registerTS()}}   
             onChangeText={text=> setThreeSame(text)}
             value={threeSame}
@@ -379,7 +453,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Four same'
-            leftIcon={{ size:15, type:'material-community', name:'dice-6',
+            leftIcon={{ size:18, type:'material-community', name:'dice-d4',
                 onPress:()=>registerFS()}}
             onChangeText={text=> setFourSame(text)}
             value={fourSame}
@@ -389,7 +463,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Full house'
-            leftIcon={{ size:15, type:'material-community', name:'dice-6',
+            leftIcon={{ size:18, type:'material', name:'grade',
                 onPress:()=>registerFull()}}
             onChangeText={text=> setFullH(text)}
             value={fullH}
@@ -399,7 +473,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Small straight'
-            leftIcon={{ size:15, type:'material-community', name:'dice-6',
+            leftIcon={{ size:18, type:'material-community', name:'dice-multiple',
                 onPress:()=>registerSmall()}}
             onChangeText={text=> setStraightS(text)}
             value={straighS}
@@ -409,7 +483,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Big straight'
-            leftIcon={{ size:15, type:'material-community', name:'dice-6',
+            leftIcon={{ size:18, type:'material-community', name:'dice-d20',
                 onPress:()=>registerBig()}}
             onChangeText={text=> setStraightB(text)}
             value={straighB}
@@ -419,7 +493,7 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='Chance'
-            leftIcon={{ size:15, type:'material-community', name:'dice-6',
+            leftIcon={{ size:18, type:'material-community', name:'dice-multiple',
                 onPress:()=>registerChance()}}
             onChangeText={text=>setChance(text)}
             value={chance}
@@ -429,27 +503,28 @@ export default function PlayScreen(props) {
             inputStyle={styles.text}
             keyboardType='numeric'
             placeholder='YATZY'
-            leftIcon={{ size:15, type:'material-community', name:'dice-6', 
+            leftIcon={{ size:18, type:'material-community', name:'diamond-stone', 
                 onPress:()=>registerYatzy()}}
             onChangeText={text=>setYatzy(text)}
             value={yatzy}  
         />
       </View>
     </View>
-    );
+    );}
 };
 
 const styles = StyleSheet.create({
     container: {
       flex: 1,
       flexDirection: 'row',
-      marginTop: 50,
-      backgroundColor: '#fff',
+      marginTop: 40,
+      marginLeft: 30,
+      marginRight: 15,
       alignItems: 'center',
       justifyContent: 'center',
     },
     input: {
-      width: 80,
+      width: 82,
       height: 11,
       paddingBottom: 6,
     },
