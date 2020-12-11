@@ -3,9 +3,7 @@ import{ View, Text, StyleSheet, FlatList } from'react-native';
 import Firebase from './firebase';
 
 export default function HighScores() {
-
-const [name, setName] = useState('');
-const [points, setPoints] = useState(0);
+  
 const [results, setResults] =useState([]);
 
 useEffect(() => {

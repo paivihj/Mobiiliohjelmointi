@@ -1,20 +1,24 @@
 import React, { useState, useEffect, useRef } from'react';
 import { View, StyleSheet, Image, Alert, BackHandler } from'react-native';
-import { Button, Overlay, Text, Input, Icon} from 'react-native-elements';
+import { Overlay, Text, Input, Icon} from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 import DialogInput from 'react-native-dialog-input';
 import Firebase from './firebase';
 import * as Permissions from 'expo-permissions';
 import { Camera } from'expo-camera';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
+import * as Location from 'expo-location';
+import Hyperlink from 'react-native-hyperlink';
+import Constants from 'expo-constants';
 
 export default function PlayScreen(props) {
+
+    const key = process.env.EXPO_KEY_CONFIG || Constants.manifest.key.key;
     const [visible, setVisible] = useState(true);
     const [hasCameraPermission, setPermission] = useState(null);
     const[photoName, setPhotoName] = useState('');
     const [type, setType] = useState(Camera.Constants.Type.front);
     const camera= useRef(null);
+    const [coordinates, setCoordinates] = React.useState({latitude: 0, longitude: 0});
 
     const [ones, setOnes] = useState('');
     const [twos, setTwos] = useState('');
@@ -34,14 +38,15 @@ export default function PlayScreen(props) {
     const [total, setTotal]=useState(0);
     const [bonus, setBonus]=useState(0);
     const [rounds, setRounds]=useState(0);
+
+    const [city, setCity] = useState('');
     const [name, setName] = useState('');
     const [help, setHelp] =useState(false);
     const [alert, setAlert]=useState(true);
 
-    const iconSize=useState(15);
-
     useEffect(() =>{
         askCamera();
+        getLocation();
       }, []);
 
       const askCamera = async () => {
@@ -55,7 +60,6 @@ export default function PlayScreen(props) {
           const photo = await camera.current.takePictureAsync({base: true});
           console.log(photo);
           setPhotoName(photo.uri);
-          //this.props.navigation.navigate("Play", { data: photoName })
           setVisible(false);
         }
       };
@@ -66,12 +70,24 @@ export default function PlayScreen(props) {
         } else {
           setType(Camera.Constants.Type.front);
         }
-      }
+      };    
+    
+    const getLocation = async () => {
+        let { status } = await Location.requestPermissionsAsync();
+        if (status !== 'granted'){
+          Alert.alert('No permission to location');
+        }
+        else {
+          let currentlocation = await Location.getCurrentPositionAsync({});
+          setCoordinates({latitude: currentlocation.coords.latitude, longitude: currentlocation.coords.longitude});
+        }
+      };
     
     useEffect(() => {
         if (rounds==15 && name.length==0 && alert==true) {
+            getCity();
             Alert.alert(
-                "You are the champion with " + total + " points!",
+                "You are the Yatzy champion of " + city +  " with " + total + " points!",
                 "If you want to save your result, press SAVE",
                 [
                     {
@@ -89,6 +105,19 @@ export default function PlayScreen(props) {
         }
     });
 
+    const getCity = () => {
+        const url = 
+        `http://www.mapquestapi.com/geocoding/v1/reverse?key=${key}&location=${coordinates.latitude},${coordinates.longitude}`;
+        fetch(url)
+        .then((response) => response.json()) 
+        .then((data) => {
+          setCity(data.results[0].locations[0].adminArea5);
+        })
+        .catch((error)=>{
+            Alert.alert('Error', error);
+        });
+      }
+
     const saveResult = () => {
         setHelp(true);
     };
@@ -99,9 +128,8 @@ export default function PlayScreen(props) {
         );
         props.navigation.navigate("High Scores");
     }
-    
+    //Register functions for all values:
     const registerYatzy = () => {
-        //console.log(yatzy);
         var y = parseInt(yatzy);
         console.log(y);
         if (y==50 || y==0) {
@@ -309,19 +337,27 @@ export default function PlayScreen(props) {
         return (
           <View style={styles.container}>
           <Overlay isVisible={visible}>
-            <View>
-                <Text style={{ fontSize:20, fontWeight:'bold' }}>
+            <View style={{marginTop:40}}>
+                <View style={{flexDirection:'row'}}>
+                    <Icon size={22} type='material-community' name='dice-1'/>
+                    <Icon size={22} type='material-community' name='dice-2'/>
+                    <Icon size={22} type='material-community' name='dice-3'/>
+                    <Text style={{ fontSize:22, fontWeight:'bold'}}>
                     Welcome to Yatzy!</Text>
-                <Text>Take a photo of the player to enter the result table.</Text>
+                    <Icon size={22} type='material-community' name='dice-4'/>
+                    <Icon size={22} type='material-community' name='dice-5'/>
+                    <Icon size={22} type='material-community' name='dice-6'/>
+                </View>
+                <Text>Take a photo of the player to enter the result table. To play, you need 5 dices.</Text>
             { hasCameraPermission ?
                 (
                 <View style={{ flex:1 }}>
                 <Camera type={type} onPress={setCamera} 
-                      style={{ flex:3, margin:20, width:250 }} ref={camera}
+                      style={{ flex:6, margin:30, width:280 }} ref={camera}
                 />
-            <View style={{ flex: 2 }}>
-             <Button title="Change Camera" onPress={setCamera}/>
-             <Button title="Take Photo" onPress={snap} />
+            <View style={{ flex: 2, flexDirection:'row', justifyContent:'space-around' }}>
+             <Icon size={40} type='material-community' name='cached' onPress={setCamera}/>
+             <Icon size={40} type='material-community' name='camera'  onPress={snap} />
             </View>
             </View>
             ) : (
@@ -335,23 +371,25 @@ export default function PlayScreen(props) {
     else if (!visible){
     return(
     <View style={styles.container}>
+      <View style={{flex:1}}>
+        <Text style={{fontSize: 14, fontStyle:'italic'}}>
+            Throw dices according to rules: </Text>
+            <Hyperlink linkDefault={ true }><Text style={{color:'grey', textDecorationLine: 'underline'}}>https://www.rolld6.com/2013/artikkelit/yatzy-eng/</Text></Hyperlink>
+            <Text style={{fontSize: 14, fontStyle:'italic'}}>Insert your points on the rows right. To register the result, press the (dice) icon.
+            Good luck!
+        </Text>
+        <Image style={{height:150, width: 120, borderRadius: 20}}
+            source={{ uri: photoName }} />
+        <Text h4>
+            Total points 
+        </Text>
+        <Text h3>{total}</Text>
         <DialogInput isDialogVisible={help}
                 title={"Insert the name of the player"}
                 hintInput ={"Name"}
                 submitInput={ (inputText) => {setName(inputText); saveToFirebase(inputText); setHelp(false)}}
                 closeDialog={ () => BackHandler.exitApp()}>
         </DialogInput>
-      <View style={{flex:1, justifyContent: 'flex-end'}}>
-        <Text style={{fontSize: 14, fontStyle:'italic'}}>
-            Insert your points on the rows right. To register the result, press the icon on the left.
-            Good luck!
-        </Text>
-        <Image style={{height:150, width: 120}}
-            source={{ uri: photoName }} />
-        <Text h4>
-            Total points 
-        </Text>
-        <Text h3>{total}</Text>
       </View>
       <View style={{flex: 1, marginTop: 15}}>
         <Input
@@ -416,7 +454,7 @@ export default function PlayScreen(props) {
         />
         <View style={{flexDirection:'row'}}>
         <Icon style={{ paddingBottom: 20, marginLeft:10}} size={15} type='material-community' name='comment-plus'/>
-        <Text style={{ alignContent:'flex-start', height: 20, marginLeft: 2, marginBottom: 10, textDecorationLine: 'underline'}}>Bonus {bonus}</Text>
+        <Text style={{ fontSize: 11, alignContent:'flex-start', height: 20, marginLeft: 2, marginBottom: 10, textDecorationLine: 'underline'}}>  Bonus   {bonus}       </Text>
         </View>
         <Input
             inputContainerStyle={styles.input}
@@ -524,11 +562,11 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
     },
     input: {
-      width: 82,
+      width: 90,
       height: 11,
       paddingBottom: 6,
     },
     text:{
-      fontSize: 10,
+      fontSize: 11,
     },
   });
