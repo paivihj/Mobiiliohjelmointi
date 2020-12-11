@@ -1,4 +1,4 @@
-#Yatzy Dice Game Result Table
+# Yatzy Dice Game Result Table
 
 This app was done with React Native and Expo as a final project of mobile programming course.
 React Native Elements toolkit was also used.
